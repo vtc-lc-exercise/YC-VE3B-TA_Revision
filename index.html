@@ -6,13 +6,34 @@
     <title>VE3B: Workplace Correspondence III</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        /* 仅修改背景色为你需要的样式，其他样式不变 */
+        /* 背景色 */
         body { 
             background: linear-gradient(135deg, #e9d5ff, #c4b5fd, #a78bfa); 
             padding: 15px; 
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
-        /* 以下均为你最初版本的样式，无额外修改 */
+        /* 彩带动画容器 */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            animation: confetti-fall 3s ease-in-out forwards;
+            z-index: 9999;
+        }
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-10px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        /* 原有样式 */
         .top-bar {
             background: #6366f1;
             color: white;
@@ -28,7 +49,9 @@
             background: #ffffff; 
             padding: 0;
             border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 1;
         }
         .content-wrapper {
             padding: 25px;
@@ -148,9 +171,9 @@
             <!-- 封面页 -->
             <div class="page active" id="cover-page">
                 <div class="cover-page">
-                    <div class="cover-icons">🏛️ 🏢 📧</div>
+                    <div class="cover-icons"> 🪇 🎈 🏢</div>
                     <h1 class="cover-title">VE3B: Workplace Correspondence III</h1>
-                    <h2 style="border: none; color: #4b5563; font-size: 1.2rem;">Revision Exercise ✨</h2>
+                    <h2 style="border: none; color: #4b5563; font-size: 1.2rem;">Revision Exercise for Topic Assessment ✨</h2>
                     <p style="font-size: 1rem; color: #6b7280; margin: 15px 0;">Ready to master verb forms and improve your workplace writing skills?</p>
                     <ul class="cover-features">
                         <li>✨ Tap or click the highlighted error words to edit</li>
@@ -343,23 +366,24 @@
     </div>
 
     <script>
-        // 正确答案数据
+        // 正确答案数据 - 支持多答案
         const correctAnswers = {
-            1: { company: "company's", preference: "preferences" },
-            2: { align: "aligns", "with out": "without" },
-            3: { upgrading: "upgrade", for: "to", relate: "related" },
-            4: { "the Easter": "Easter", world: "would" },
-            5: { "(missing word)": "it", "making": "make" }
+            1: { company: ["company's"], preference: ["preferences"] },
+            2: { align: ["aligns", "can align"], "with out": ["without"] },
+            3: { upgrading: ["upgrade"], for: ["to"], relate: ["related"] },
+            4: { "the Easter": ["Easter"], world: ["would"] },
+            5: { "(missing word)": ["it"], making: ["make", "to make"] }
         };
         let score = 0;
         let answeredQuestions = [];
         let errorWordElements = {};
         let correctQuestions = [];
+        // 修正题目总数为10题
         const allQuestionIds = [
             "1-company", "1-preference", "2-align", "2-with out",
             "3-upgrading", "3-for", "3-relate", "4-the Easter", "4-world",
             "5-(missing word)", "5-making"
-        ].filter(id => id);
+        ].filter(id => id).slice(0, 10);
 
         function goToPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
@@ -402,8 +426,9 @@
                 return;
             }
 
-            const correctAnswer = correctAnswers[partNum]?.[errorKey] || "";
-            if (!correctAnswer) {
+            // 获取正确答案数组
+            const correctAnswerList = correctAnswers[partNum]?.[errorKey] || [];
+            if (correctAnswerList.length === 0) {
                 feedback.className = "feedback feedback-empty";
                 feedback.innerHTML = "⚠️ This question's answer is not configured properly.";
                 feedback.style.display = "block";
@@ -411,7 +436,8 @@
             }
 
             feedback.style.display = "block";
-            if (userAnswer === correctAnswer) {
+            // 判断用户答案是否在正确答案列表中
+            if (correctAnswerList.includes(userAnswer)) {
                 feedback.className = "feedback feedback-correct";
                 feedback.innerHTML = `✅ Correct! Explanation: ${getExplanation(partNum, errorKey)}`;
                 if (errorWordElements[questionId]) {
@@ -419,16 +445,18 @@
                 }
                 if (!correctQuestions.includes(questionId)) {
                     correctQuestions.push(questionId);
-                    score = correctQuestions.length;
+                    score = correctQuestions.length; // 得分等于正确题数
                 }
                 editBox.style.display = "none";
             } else {
-                if (userAnswer.toLowerCase() === correctAnswer.toLowerCase() && userAnswer !== correctAnswer) {
+                // 大小写错误判断
+                const isCaseError = correctAnswerList.some(ans => ans.toLowerCase() === userAnswer.toLowerCase() && ans !== userAnswer);
+                if (isCaseError) {
                     feedback.className = "feedback feedback-case";
-                    feedback.innerHTML = `⚠️ Almost correct! Check capitalisation. The right answer is: ${correctAnswer}`;
+                    feedback.innerHTML = `⚠️ Almost correct! Check capitalisation. The right answer(s) are: ${correctAnswerList.join(", ")}`;
                 } else {
                     feedback.className = "feedback feedback-incorrect";
-                    feedback.innerHTML = `⚠️ Incorrect. Right answer is: ${correctAnswer}<br>Explanation: ${getExplanation(partNum, errorKey)}`;
+                    feedback.innerHTML = `⚠️ Incorrect. The right answer(s) are: ${correctAnswerList.join(", ")}<br>Explanation: ${getExplanation(partNum, errorKey)}`;
                 }
                 input.value = "";
                 input.focus();
@@ -439,11 +467,40 @@
             }
         }
 
+        // 生成彩带动画
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            const body = document.querySelector('body');
+            // 生成100个彩带
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                // 随机颜色、位置、大小、动画延迟
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.animationDelay = `${Math.random() * 3}s`;
+                body.appendChild(confetti);
+                // 动画结束后移除元素
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
         function calculateScore() {
-            document.getElementById("final-score").textContent = score;
+            score = correctQuestions.length;
+            // 限制最高得分为10分
+            const finalScore = Math.min(score, 10);
+            document.getElementById("final-score").textContent = finalScore;
             const isAllAnswered = allQuestionIds.every(id => answeredQuestions.includes(id));
             document.getElementById("unfinished-notice").style.display = isAllAnswered ? "none" : "block";
             goToPage("score-page");
+            // 全对时触发彩带动画
+            if (finalScore === 10) {
+                createConfetti();
+            }
         }
 
         function resetExercise() {
@@ -473,7 +530,7 @@
                     preference: "Change singular noun to plural (preference → preferences) to match context."
                 },
                 2: {
-                    align: "3rd person singular verb needs 's' (this option → aligns).",
+                    align: "3rd person singular verb needs 's' (aligns) or use modal verb + base verb (can align).",
                     "with out": "Correct spelling: 'without' (one word, not two)."
                 },
                 3: {
@@ -487,7 +544,7 @@
                 },
                 5: {
                     "(missing word)": "Pronoun 'it' is needed to complete the structure 'appreciate it if...'.",
-                    making: "Verb 'help' is followed by base form: 'help us make' (not 'making')."
+                    making: "Verb 'help' is followed by base form (make) or to-infinitive (to make)."
                 }
             };
             return explanations[partNum]?.[errorKey] || "Please follow grammar rules to correct the error.";
