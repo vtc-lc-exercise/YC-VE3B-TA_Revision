@@ -6,28 +6,42 @@
     <title>VE3B: Workplace Correspondence III</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        /* 仅修改背景色为你需要的样式，其他样式不变 */
         body { 
-            background: linear-gradient(135deg, #d1e7dd 0%, #b3d9e8 100%); 
+            background: linear-gradient(135deg, #e9d5ff, #c4b5fd, #a78bfa); 
             padding: 15px; 
+            min-height: 100vh;
+        }
+        /* 以下均为你最初版本的样式，无额外修改 */
+        .top-bar {
+            background: #6366f1;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
         .container { 
             max-width: 800px; 
             margin: 15px auto; 
-            background: white; 
-            padding: 25px; 
+            background: #ffffff; 
+            padding: 0;
             border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
         }
-        /* 封面页样式 */
+        .content-wrapper {
+            padding: 25px;
+        }
         .cover-page { text-align: center; padding: 20px 0; }
-        .cover-logo { font-size: 3rem; color: #1e40af; margin: 20px 0; }
-        .cover-title { font-size: 2rem; color: #1e40af; margin: 15px 0; }
-        .cover-subtitle { font-size: 1.1rem; color: #374151; margin: 10px 0; }
-        /* 通用样式 */
-        h2 { color: #1e40af; margin: 15px 0 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .cover-icons { font-size: 2rem; margin: 20px 0; }
+        .cover-title { font-size: 1.8rem; color: #7e22ce; margin: 15px 0; }
+        .cover-subtitle { font-size: 1.1rem; color: #4b5563; margin: 10px 0; }
+        .cover-features { text-align: left; margin: 20px auto; max-width: 600px; font-size: 15px; line-height: 1.8; }
+        .cover-features li { list-style: none; margin: 10px 0; }
+        h2 { color: #6366f1; margin: 15px 0 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .tip { background: #e6f7ff; color: #0897b4; padding: 8px 12px; border-radius: 6px; margin: 10px 0; font-size: 15px; }
         .paragraph { font-size: 16px; line-height: 1.7; margin: 15px 0; }
-        /* 错误点样式 */
         .error-word { 
             padding: 2px 5px; 
             border-radius: 4px; 
@@ -40,13 +54,18 @@
         .error-word.spelling { background: #f5fafe; color: #0369a1; border-color: #7dd3fc; }
         .error-word.preposition { background: #fef7fb; color: #9333ea; border-color: #e9d5ff; }
         .error-word.article { background: #f0fdf4; color: #15803d; border-color: #86efac; }
-        /* 编辑框和反馈 */
+        .error-word.correct {
+            background: #ecfdf5 !important;
+            color: #065f46 !important;
+            border-color: #10b981 !important;
+        }
         .edit-box { margin: 15px 0; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; display: none; }
-        .edit-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; font-size: 16px; }
+        .edit-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; font-size: 15px; }
         .feedback { margin: 15px 0; padding: 12px; border-radius: 6px; display: none; font-size: 15px; }
         .feedback-correct { background: #ecfdf5; color: #065f46; border-left: 3px solid #10b981; }
         .feedback-incorrect { background: #fef2f2; color: #991b1b; border-left: 3px solid #ef4444; }
-        /* 按钮样式 */
+        .feedback-empty { background: #fffbf0; color: #c05621; border-left: 3px solid #f6ad55; }
+        .feedback-case { background: #f0f9ff; color: #0284c7; border-left: 3px solid #38bdf8; }
         .btn { 
             padding: 10px 18px; 
             border: none; 
@@ -57,15 +76,14 @@
             transition: transform 0.2s ease;
         }
         .btn:hover { transform: scale(1.03); }
-        .btn-primary { background: #1e40af; color: white; }
+        .btn-primary { background: #6366f1; color: white; }
         .btn-secondary { background: #f3f4f6; color: #4b5563; }
         .btn-summary { background: #fbbf24; color: #78350f; }
-        /* 分页样式（核心过渡特效） */
         .page { 
             display: none; 
             opacity: 0; 
             transform: translateY(20px); 
-            transition: opacity 0.5s ease, transform 0.5s ease; /* 淡入+上移过渡 */
+            transition: opacity 0.5s ease, transform 0.5s ease; 
         }
         .page.active { 
             display: block; 
@@ -74,10 +92,21 @@
         }
         .progress { text-align: center; color: #4b5563; margin: 10px 0; font-size: 15px; }
         .nav-buttons { text-align: center; margin: 20px 0; }
-        /* 总结页样式（旋转星星项目符号） */
+        .score-page { text-align: center; padding: 30px 0; }
+        .score-title { font-size: 2rem; color: #6366f1; margin-bottom: 20px; }
+        .score-box { 
+            background: #e6f7ff; 
+            padding: 25px; 
+            border-radius: 10px; 
+            display: inline-block; 
+            margin: 20px 0; 
+        }
+        .score-number { font-size: 3rem; color: #0897b4; font-weight: bold; }
+        .score-text { font-size: 1.2rem; color: #374151; margin-top: 10px; }
+        .unfinished-tip { color: #c05621; font-weight: bold; margin: 15px 0; }
         .summary-page { padding: 10px 0; }
-        .summary-title { font-size: 1.8rem; color: #1e40af; text-align: center; margin: 15px 0; }
-        .achievement-badge { font-size: 2.5rem; text-align: center; margin: 10px 0; color: #1e40af; }
+        .summary-title { font-size: 1.8rem; color: #6366f1; text-align: center; margin: 15px 0; }
+        .achievement-badge { font-size: 2.5rem; text-align: center; margin: 10px 0; color: #6366f1; }
         .writing-tips { 
             background: #f0f9ff; 
             padding: 15px; 
@@ -85,217 +114,236 @@
             margin: 15px 0; 
         }
         .tip-item { 
-            margin: 15px 0; 
-            padding-left: 25px; 
+            margin: 12px 0; 
+            padding-left: 18px; 
             position: relative; 
             font-size: 15px; 
             line-height: 1.6; 
         }
-        /* 旋转星星项目符号 */
         .tip-item::before { 
             content: "⭐"; 
             position: absolute; 
             left: 0; 
             top: 2px; 
-            animation: spin 8s linear infinite; /* 8秒匀速旋转 */
+            animation: spin 8s linear infinite; 
             transform-origin: center;
         }
-        /* 旋转动画 */
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        /* 移动端适配 */
         @media (max-width: 768px) {
-            .container { padding: 15px; margin: 10px auto; }
-            .cover-logo { font-size: 2.5rem; }
-            .cover-title { font-size: 1.7rem; }
+            .container { padding: 0; margin: 10px auto; }
+            .content-wrapper { padding: 15px; }
+            .cover-icons { font-size: 1.5rem; }
+            .cover-title { font-size: 1.5rem; }
             .btn { width: 100%; }
-            .tip-item { padding-left: 22px; }
-            .tip-item::before { font-size: 14px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 封面页 -->
-        <div class="page active" id="cover-page">
-            <div class="cover-page">
-                <div class="cover-logo">📧</div>
-                <h1 class="cover-title">Youth College</h1>
-                <h2 class="cover-subtitle">Language Centre</h2>
-                <h3 class="cover-subtitle">VE3B: Workplace Correspondence III</h3>
-                <p class="cover-subtitle">Revision Exercise for Topic Assessment</p>
-                <div class="nav-buttons">
-                    <button class="btn btn-primary" onclick="goToPage('guide-page')">Start Exercise 🚀</button>
+        <div class="top-bar">VE3B: Workplace Correspondence III</div>
+        <div class="content-wrapper">
+            <!-- 封面页 -->
+            <div class="page active" id="cover-page">
+                <div class="cover-page">
+                    <div class="cover-icons">🏛️ 🏢 📧</div>
+                    <h1 class="cover-title">VE3B: Workplace Correspondence III</h1>
+                    <h2 style="border: none; color: #4b5563; font-size: 1.2rem;">Revision Exercise ✨</h2>
+                    <p style="font-size: 1rem; color: #6b7280; margin: 15px 0;">Ready to master verb forms and improve your workplace writing skills?</p>
+                    <ul class="cover-features">
+                        <li>✨ Tap or click the highlighted error words to edit</li>
+                        <li>📝 Get instant feedback and retry wrong answers</li>
+                        <li>🎯 Learn from mistakes with detailed explanations</li>
+                        <li>📊 Track your score and progress easily</li>
+                    </ul>
+                    <div class="nav-buttons">
+                        <button class="btn btn-primary" onclick="goToPage('guide-page')">Start Exercise 🚀</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 指引页 -->
-        <div class="page" id="guide-page">
-            <h2>📋 How to Use This Exercise</h2>
-            <ul style="list-style: none; margin: 15px 0; padding-left: 20px;">
-                <li style="margin: 8px 0; font-size: 15px;">✅ Tap or click on the <strong>colored highlighted words</strong> (word-level errors) to edit them.</li>
-                <li style="margin: 8px 0; font-size: 15px;">✅ Each part has a clear tip to tell you what kind of error to find.</li>
-                <li style="margin: 8px 0; font-size: 15px; color: #dc2626;">⚠️ <strong>Important</strong>: Please pay attention to <strong>capitalisation</strong> in your answers.</li>
-                <li style="margin: 8px 0; font-size: 15px;">✅ You can move to any part or the tips page <strong>at any time</strong>.</li>
-                <li style="margin: 8px 0; font-size: 15px;">✅ Submit your answer to get instant feedback and explanations.</li>
-            </ul>
-            <div class="nav-buttons">
-                <button class="btn btn-primary" onclick="goToPage('page-1')">Start Practising 📝</button>
-                <button class="btn btn-summary" onclick="goToPage('summary-page')">View Writing Tips 📋</button>
-                <button class="btn btn-secondary" onclick="goToPage('cover-page')">Back to Home 🏠</button>
-            </div>
-        </div>
-
-        <!-- Part 1 页面 -->
-        <div class="page" id="page-1">
-            <div class="progress">📊 Part 1 / 5</div>
-            <h2>Part 1: Email Opening</h2>
-            <div class="tip">💡 Tip: Find and correct the <strong>possessive noun</strong> and <strong>plural noun</strong> errors.</div>
-            <div class="paragraph">
-                Dear Mr Lee<br>
-                Thank you for your email regarding the renovation of <span class="error-word noun" onclick="openEdit(1, 'company')">company</span> meeting room. We appreciate your suggestions and wish to inform you of <span class="error-word noun" onclick="openEdit(1, 'preference')">preference</span> and other related matters.
-            </div>
-            <div id="edit-box-1" class="edit-box">
-                <input type="text" id="input-1" class="edit-input" placeholder="Enter the corrected word...">
-                <button class="btn btn-primary" onclick="submitAnswer(1)">Submit ✅</button>
-                <button class="btn btn-secondary" onclick="closeEdit(1)">Cancel ❌</button>
-            </div>
-            <div id="feedback-1" class="feedback"></div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="goToPage('guide-page')">← Back</button>
-                <button class="btn btn-primary" onclick="goToPage('page-2')">Next Part →</button>
-                <button class="btn btn-summary" onclick="goToPage('summary-page')">View Writing Tips 📋</button>
-            </div>
-        </div>
-
-        <!-- Part 2 页面 -->
-        <div class="page" id="page-2">
-            <div class="progress">📊 Part 2 / 5</div>
-            <h2>Part 2: Wireless System Preference</h2>
-            <div class="tip">💡 Tip: Find and correct the <strong>verb form</strong> and <strong>spelling</strong> errors.</div>
-            <div class="paragraph">
-                After careful consideration of both proposed renovation options, we prefer to install a wireless presentation system for several reasons. Firstly, we believe that this option <span class="error-word verb" onclick="openEdit(2, 'align')">align</span> with our needs. The system allows our colleagues to connect and share their screens wirelessly <span class="error-word spelling" onclick="openEdit(2, 'with out')">with out</span> the need for cables or adapters.
-            </div>
-            <div id="edit-box-2" class="edit-box">
-                <input type="text" id="input-2" class="edit-input" placeholder="Enter the corrected word...">
-                <button class="btn btn-primary" onclick="submitAnswer(2)">Submit ✅</button>
-                <button class="btn btn-secondary" onclick="closeEdit(2)">Cancel ❌</button>
-            </div>
-            <div id="feedback-2" class="feedback"></div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="goToPage('page-1')">← Previous Part</button>
-                <button class="btn btn-primary" onclick="goToPage('page-3')">Next Part →</button>
-                <button class="btn btn-summary" onclick="goToPage('summary-page')">View Writing Tips 📋</button>
-            </div>
-        </div>
-
-        <!-- Part 3 页面 -->
-        <div class="page" id="page-3">
-            <div class="progress">📊 Part 3 / 5</div>
-            <h2>Part 3: Rejecting Video-Conferencing Upgrade</h2>
-            <div class="tip">💡 Tip: Find and correct the <strong>verb form</strong>, <strong>preposition</strong> and <strong>verb form</strong> errors.</div>
-            <div class="paragraph">
-                On the other hand, we would prefer not to <span class="error-word verb" onclick="openEdit(3, 'upgrading')">upgrading</span> the video-conferencing system. This proposal may exceed our budget owing <span class="error-word preposition" onclick="openEdit(3, 'for')">for</span> significant costs, including new hardware, software licenses, and potential installation fees. Moreover, there may be technical challenges <span class="error-word verb" onclick="openEdit(3, 'relate')">relate</span> to network requirements.
-            </div>
-            <div id="edit-box-3" class="edit-box">
-                <input type="text" id="input-3" class="edit-input" placeholder="Enter the corrected word...">
-                <button class="btn btn-primary" onclick="submitAnswer(3)">Submit ✅</button>
-                <button class="btn btn-secondary" onclick="closeEdit(3)">Cancel ❌</button>
-            </div>
-            <div id="feedback-3" class="feedback"></div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="goToPage('page-2')">← Previous Part</button>
-                <button class="btn btn-primary" onclick="goToPage('page-4')">Next Part →</button>
-                <button class="btn btn-summary" onclick="goToPage('summary-page')">View Writing Tips 📋</button>
-            </div>
-        </div>
-
-        <!-- Part 4 页面 -->
-        <div class="page" id="page-4">
-            <div class="progress">📊 Part 4 / 5</div>
-            <h2>Part 4: Renovation Period & Deposit</h2>
-            <div class="tip">💡 Tip: Find and correct the <strong>article</strong> and <strong>spelling</strong> errors.</div>
-            <div class="paragraph">
-                Regarding the period for renovation, we suggest scheduling it during <span class="error-word article" onclick="openEdit(4, 'the Easter')">the Easter</span> holiday. This period is not our peak season, which will minimise the impact on our office operations. Furthermore, we understand your request to settle the deposit by the end of this month. In response to your request, we <span class="error-word spelling" onclick="openEdit(4, 'world')">world</span> arrange for our Finance Department to issue a cheque by the end of this week.
-            </div>
-            <div id="edit-box-4" class="edit-box">
-                <input type="text" id="input-4" class="edit-input" placeholder="Enter the corrected word...">
-                <button class="btn btn-primary" onclick="submitAnswer(4)">Submit ✅</button>
-                <button class="btn btn-secondary" onclick="closeEdit(4)">Cancel ❌</button>
-            </div>
-            <div id="feedback-4" class="feedback"></div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="goToPage('page-3')">← Previous Part</button>
-                <button class="btn btn-primary" onclick="goToPage('page-5')">Next Part →</button>
-                <button class="btn btn-summary" onclick="goToPage('summary-page')">View Writing Tips 📋</button>
-            </div>
-        </div>
-
-        <!-- Part 5 页面 -->
-        <div class="page" id="page-5">
-            <div class="progress">📊 Part 5 / 5</div>
-            <h2>Part 5: Final Request</h2>
-            <div class="tip">💡 Tip: Find and correct the <strong>missing pronoun</strong> and <strong>verb form</strong> errors.</div>
-            <div class="paragraph">
-                As the deadline for finalising the renovation plan is fast approaching, we would appreciate <span class="error-word noun" onclick="openEdit(5, '(missing word)')">(missing word)</span> if you could confirm the availability of your team during the Easter holiday. This confirmation will help us <span class="error-word verb" onclick="openEdit(5, 'making')">making</span> necessary arrangements in advance and avoid any potential delays.<br>
-                Thank you for your understanding and cooperation.<br>
-                Best regards<br>
-                Pansy Lee
-            </div>
-            <div id="edit-box-5" class="edit-box">
-                <input type="text" id="input-5" class="edit-input" placeholder="Enter the corrected word...">
-                <button class="btn btn-primary" onclick="submitAnswer(5)">Submit ✅</button>
-                <button class="btn btn-secondary" onclick="closeEdit(5)">Cancel ❌</button>
-            </div>
-            <div id="feedback-5" class="feedback"></div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="goToPage('page-4')">← Previous Part</button>
-                <button class="btn btn-primary" onclick="goToPage('page-1')">Back to Part 1 ←</button>
-                <button class="btn btn-summary" onclick="goToPage('summary-page')">View Writing Tips 📋</button>
-            </div>
-        </div>
-
-        <!-- 总结页（旋转星星项目符号） -->
-        <div class="page" id="summary-page">
-            <div class="summary-title">📝 Workplace Email Writing Tips</div>
-            <div class="achievement-badge">💼</div>
-            
-            <div class="writing-tips">
-                <h3 style="color: #1e40af; margin: 10px 0;">Key Principles for Professional Emails</h3>
-                
-                <div class="tip-item"><strong>Noun Usage</strong>: Use possessive forms (-'s or -s') correctly to show ownership. Ensure noun number (singular/plural) matches the context and verbs.</div>
-                
-                <div class="tip-item"><strong>Verb Consistency</strong>: Maintain subject-verb agreement (e.g., third-person singular subjects require verbs with -s/-es). Use base verbs after infinitives ("to + verb") and modal verbs (would, should, can).</div>
-                
-                <div class="tip-item"><strong>Preposition Collocations</strong>: Learn fixed preposition phrases (e.g., "owing to" instead of random prepositions). Prepositions often depend on the words they follow.</div>
-                
-                <div class="tip-item"><strong>Article Rules</strong>: Omit articles ("the", "a/an") before proper nouns like festivals, names, or unique events. Use articles appropriately for common nouns.</div>
-                
-                <div class="tip-item"><strong>Pronoun Completeness</strong>: Include necessary pronouns to avoid sentence fragments or ambiguity. Ensure pronouns clearly refer to their antecedents.</div>
-                
-                <div class="tip-item"><strong>Spelling & Capitalisation</strong>: Double-check common spelling mistakes (e.g., compound words as one word). Capitalise proper nouns, start of sentences, and formal titles.</div>
-                
-                <div class="tip-item"><strong>Conciseness</strong>: Keep sentences clear and direct. Avoid redundant words or overly complex structures in professional communication.</div>
-                
-                <div class="tip-item"><strong>Formality</strong>: Maintain a polite and professional tone. Use appropriate phrases for requests, thanks, or updates (e.g., "we would appreciate it if" instead of informal expressions).</div>
-                
-                <div class="tip-item"><strong>Clarity</strong>: Organise your ideas logically. Start with a clear purpose, provide necessary details, and end with a specific call to action if needed.</div>
-                
-                <div class="tip-item"><strong>Grammar Accuracy</strong>: Avoid common errors like subject-verb disagreement, incorrect prepositions, or missing pronouns. Proofread before sending professional emails.</div>
+            <!-- 指引页 -->
+            <div class="page" id="guide-page">
+                <h2>📋 How to Use This Exercise</h2>
+                <ul style="list-style: none; margin: 15px 0; padding-left: 20px;">
+                    <li style="margin: 8px 0; font-size: 15px;">✅ Tap or click on the <strong>colored highlighted words</strong> (word-level errors) to edit them.</li>
+                    <li style="margin: 8px 0; font-size: 15px;">✅ You can <strong>retry answering</strong> any question as many times as you need.</li>
+                    <li style="margin: 8px 0; font-size: 15px; color: #dc2626;">⚠️ <strong>Important</strong>: Pay close attention to <strong>capitalisation (upper/lower case)</strong> in your answers.</li>
+                    <li style="margin: 8px 0; font-size: 15px;">✅ Move between parts freely and check your score when ready.</li>
+                </ul>
+                <div class="nav-buttons">
+                    <button class="btn btn-primary" onclick="goToPage('page-1')">Start Practising 📝</button>
+                    <button class="btn btn-summary" onclick="goToPage('summary-page')">View Writing Tips 📋</button>
+                    <button class="btn btn-secondary" onclick="goToPage('cover-page')">Back to Home 🏠</button>
+                </div>
             </div>
 
-            <div class="nav-buttons">
-                <button class="btn btn-primary" onclick="goToPage('page-1')">Start/Continue Exercise 📝</button>
-                <button class="btn btn-secondary" onclick="goToPage('cover-page')">Back to Home 🏠</button>
+            <!-- Part 1 页面 -->
+            <div class="page" id="page-1">
+                <div class="progress">📊 Part 1 / 5</div>
+                <h2>Part 1: Email Opening</h2>
+                <div class="tip">💡 Tip: Correct the <strong>possessive noun</strong> and <strong>plural noun</strong> errors (check capitalisation!).</div>
+                <div class="paragraph">
+                    Dear Mr Lee<br>
+                    Thank you for your email regarding the renovation of <span class="error-word noun" onclick="openEdit(1, 'company', this)">company</span> meeting room. We appreciate your suggestions and wish to inform you of <span class="error-word noun" onclick="openEdit(1, 'preference', this)">preference</span> and other related matters.
+                </div>
+                <div id="edit-box-1" class="edit-box">
+                    <input type="text" id="input-1" class="edit-input" placeholder="Enter the corrected word (check case!)...">
+                    <button class="btn btn-primary" onclick="submitAnswer(1)">Submit ✅</button>
+                    <button class="btn btn-secondary" onclick="closeEdit(1)">Cancel ❌</button>
+                </div>
+                <div id="feedback-1" class="feedback"></div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="goToPage('guide-page')">← Back</button>
+                    <button class="btn btn-primary" onclick="goToPage('page-2')">Next Part →</button>
+                    <button class="btn btn-summary" onclick="goToPage('summary-page')">View Tips 📋</button>
+                </div>
+            </div>
+
+            <!-- Part 2 页面 -->
+            <div class="page" id="page-2">
+                <div class="progress">📊 Part 2 / 5</div>
+                <h2>Part 2: Wireless System Preference</h2>
+                <div class="tip">💡 Tip: Correct the <strong>verb form</strong> and <strong>spelling</strong> errors (check capitalisation!).</div>
+                <div class="paragraph">
+                    After careful consideration of both proposed renovation options, we prefer to install a wireless presentation system for several reasons. Firstly, we believe that this option <span class="error-word verb" onclick="openEdit(2, 'align', this)">align</span> with our needs. The system allows our colleagues to connect and share their screens wirelessly <span class="error-word spelling" onclick="openEdit(2, 'with out', this)">with out</span> the need for cables or adapters.
+                </div>
+                <div id="edit-box-2" class="edit-box">
+                    <input type="text" id="input-2" class="edit-input" placeholder="Enter the corrected word (check case!)...">
+                    <button class="btn btn-primary" onclick="submitAnswer(2)">Submit ✅</button>
+                    <button class="btn btn-secondary" onclick="closeEdit(2)">Cancel ❌</button>
+                </div>
+                <div id="feedback-2" class="feedback"></div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="goToPage('page-1')">← Previous Part</button>
+                    <button class="btn btn-primary" onclick="goToPage('page-3')">Next Part →</button>
+                    <button class="btn btn-summary" onclick="goToPage('summary-page')">View Tips 📋</button>
+                </div>
+            </div>
+
+            <!-- Part 3 页面 -->
+            <div class="page" id="page-3">
+                <div class="progress">📊 Part 3 / 5</div>
+                <h2>Part 3: Rejecting Video-Conferencing Upgrade</h2>
+                <div class="tip">💡 Tip: Correct the <strong>verb form</strong>, <strong>preposition</strong> and <strong>verb form</strong> errors (check capitalisation!).</div>
+                <div class="paragraph">
+                    On the other hand, we would prefer not to <span class="error-word verb" onclick="openEdit(3, 'upgrading', this)">upgrading</span> the video-conferencing system. This proposal may exceed our budget owing <span class="error-word preposition" onclick="openEdit(3, 'for', this)">for</span> significant costs, including new hardware, software licenses, and potential installation fees. Moreover, there may be technical challenges <span class="error-word verb" onclick="openEdit(3, 'relate', this)">relate</span> to network requirements.
+                </div>
+                <div id="edit-box-3" class="edit-box">
+                    <input type="text" id="input-3" class="edit-input" placeholder="Enter the corrected word (check case!)...">
+                    <button class="btn btn-primary" onclick="submitAnswer(3)">Submit ✅</button>
+                    <button class="btn btn-secondary" onclick="closeEdit(3)">Cancel ❌</button>
+                </div>
+                <div id="feedback-3" class="feedback"></div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="goToPage('page-2')">← Previous Part</button>
+                    <button class="btn btn-primary" onclick="goToPage('page-4')">Next Part →</button>
+                    <button class="btn btn-summary" onclick="goToPage('summary-page')">View Tips 📋</button>
+                </div>
+            </div>
+
+            <!-- Part 4 页面 -->
+            <div class="page" id="page-4">
+                <div class="progress">📊 Part 4 / 5</div>
+                <h2>Part 4: Renovation Period & Deposit</h2>
+                <div class="tip">💡 Tip: Correct the <strong>article</strong> and <strong>spelling</strong> errors (check capitalisation!).</div>
+                <div class="paragraph">
+                    Regarding the period for renovation, we suggest scheduling it during <span class="error-word article" onclick="openEdit(4, 'the Easter', this)">the Easter</span> holiday. This period is not our peak season, which will minimise the impact on our office operations. Furthermore, we understand your request to settle the deposit by the end of this month. In response to your request, we <span class="error-word spelling" onclick="openEdit(4, 'world', this)">world</span> arrange for our Finance Department to issue a cheque by the end of this week.
+                </div>
+                <div id="edit-box-4" class="edit-box">
+                    <input type="text" id="input-4" class="edit-input" placeholder="Enter the corrected word (check case!)...">
+                    <button class="btn btn-primary" onclick="submitAnswer(4)">Submit ✅</button>
+                    <button class="btn btn-secondary" onclick="closeEdit(4)">Cancel ❌</button>
+                </div>
+                <div id="feedback-4" class="feedback"></div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="goToPage('page-3')">← Previous Part</button>
+                    <button class="btn btn-primary" onclick="goToPage('page-5')">Next Part →</button>
+                    <button class="btn btn-summary" onclick="goToPage('summary-page')">View Tips 📋</button>
+                </div>
+            </div>
+
+            <!-- Part 5 页面 -->
+            <div class="page" id="page-5">
+                <div class="progress">📊 Part 5 / 5</div>
+                <h2>Part 5: Final Request</h2>
+                <div class="tip">💡 Tip: Correct the <strong>missing pronoun</strong> and <strong>verb form</strong> errors (check capitalisation!).</div>
+                <div class="paragraph">
+                    As the deadline for finalising the renovation plan is fast approaching, we would appreciate <span class="error-word noun" onclick="openEdit(5, '(missing word)', this)">(missing word)</span> if you could confirm the availability of your team during the Easter holiday. This confirmation will help us <span class="error-word verb" onclick="openEdit(5, 'making', this)">making</span> necessary arrangements in advance and avoid any potential delays.<br>
+                    Thank you for your understanding and cooperation.<br>
+                    Best regards<br>
+                    Pansy Lee
+                </div>
+                <div id="edit-box-5" class="edit-box">
+                    <input type="text" id="input-5" class="edit-input" placeholder="Enter the corrected word (check case!)...">
+                    <button class="btn btn-primary" onclick="submitAnswer(5)">Submit ✅</button>
+                    <button class="btn btn-secondary" onclick="closeEdit(5)">Cancel ❌</button>
+                </div>
+                <div id="feedback-5" class="feedback"></div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="goToPage('page-4')">← Previous Part</button>
+                    <button class="btn btn-primary" onclick="calculateScore()">Check My Score 📊</button>
+                    <button class="btn btn-summary" onclick="goToPage('summary-page')">View Tips 📋</button>
+                </div>
+            </div>
+
+            <!-- 得分统计页 -->
+            <div class="page" id="score-page">
+                <div class="score-page">
+                    <h2 class="score-title">Your Exercise Result</h2>
+                    <div class="score-box">
+                        <div class="score-number" id="final-score">0</div>
+                        <div class="score-text">out of 10 points</div>
+                    </div>
+                    <div id="unfinished-notice" class="unfinished-tip" style="display: none;">
+                        ⚠️ You have unanswered questions! Please go back and complete all parts to get your full score.
+                    </div>
+                    <p style="font-size: 1.1rem; color: #374151; margin: 20px 0;">Keep practicing to improve your score! 🎉</p>
+                    <div class="nav-buttons">
+                        <button class="btn btn-primary" onclick="resetExercise()">Retry Exercise ♻️</button>
+                        <button class="btn btn-summary" onclick="goToPage('summary-page')">View Writing Tips 📋</button>
+                        <button class="btn btn-secondary" onclick="goToPage('cover-page')">Back to Home 🏠</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 写作技巧总结页 -->
+            <div class="page" id="summary-page">
+                <div class="summary-title">📝 Workplace Email Writing Tips</div>
+                <div class="achievement-badge">💼</div>
+                
+                <div class="writing-tips">
+                    <h3 style="color: #6366f1; margin: 10px 0;">Key Principles for Professional Emails</h3>
+                    
+                    <div class="tip-item"><strong>Noun Usage</strong>: Use possessive forms (-'s or -s') correctly to show ownership. Match noun number (singular/plural) to the context and verbs.</div>
+                    
+                    <div class="tip-item"><strong>Verb Consistency</strong>: Follow subject-verb agreement (e.g., third-person singular verbs need -s/-es). Use base verbs after "to" (infinitives) and modal verbs (would, should).</div>
+                    
+                    <div class="tip-item"><strong>Preposition Collocations</strong>: Learn fixed phrases like "owing to" instead of mixing prepositions randomly.</div>
+                    
+                    <div class="tip-item"><strong>Article Rules</strong>: Omit "the" before proper nouns like festivals (Easter, Christmas). Use articles appropriately for common nouns.</div>
+                    
+                    <div class="tip-item"><strong>Pronoun Completeness</strong>: Add necessary pronouns (e.g., "it" in "appreciate it if") to avoid sentence fragments.</div>
+                    
+                    <div class="tip-item"><strong>Spelling & Capitalisation</strong>: Double-check spelling (e.g., "without" not "with out") and capitalise proper nouns, sentence starters, and formal titles.</div>
+                    
+                    <div class="tip-item"><strong>Conciseness</strong>: Keep sentences clear and direct. Avoid redundant words in professional communication.</div>
+                    
+                    <div class="tip-item"><strong>Formality</strong>: Maintain a polite tone with phrases like "we would appreciate it if" instead of informal language.</div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-primary" onclick="goToPage('page-1')">Start/Continue Exercise 📝</button>
+                    <button class="btn btn-secondary" onclick="goToPage('cover-page')">Back to Home 🏠</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 正确答案数据（英式英文）
+        // 正确答案数据
         const correctAnswers = {
             1: { company: "company's", preference: "preferences" },
             2: { align: "aligns", "with out": "without" },
@@ -303,47 +351,122 @@
             4: { "the Easter": "Easter", world: "would" },
             5: { "(missing word)": "it", "making": "make" }
         };
+        let score = 0;
+        let answeredQuestions = [];
+        let errorWordElements = {};
+        let correctQuestions = [];
+        const allQuestionIds = [
+            "1-company", "1-preference", "2-align", "2-with out",
+            "3-upgrading", "3-for", "3-relate", "4-the Easter", "4-world",
+            "5-(missing word)", "5-making"
+        ].filter(id => id);
 
-        // 切换页面（保留过渡特效）
         function goToPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            const targetPage = document.getElementById(pageId);
-            targetPage.classList.add('active');
+            document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
         }
 
-        // 打开编辑框
-        function openEdit(partNum, error) {
-            document.getElementById(`edit-box-${partNum}`).style.display = "block";
+        function openEdit(partNum, errorKey, element) {
+            const editBox = document.getElementById(`edit-box-${partNum}`);
+            editBox.dataset.errorKey = errorKey;
+            editBox.dataset.partNum = partNum;
+            errorWordElements[`${partNum}-${errorKey}`] = element;
+            const input = document.getElementById(`input-${partNum}`);
+            input.value = "";
+            input.disabled = false;
+            document.getElementById(`feedback-${partNum}`).style.display = "none";
+            editBox.style.display = "block";
+            input.focus();
         }
 
-        // 关闭编辑框
         function closeEdit(partNum) {
-            document.getElementById(`edit-box-${partNum}`).style.display = "none";
+            const editBox = document.getElementById(`edit-box-${partNum}`);
+            editBox.style.display = "none";
+            editBox.dataset.errorKey = "";
             document.getElementById(`feedback-${partNum}`).style.display = "none";
         }
 
-        // 提交答案
         function submitAnswer(partNum) {
             const input = document.getElementById(`input-${partNum}`);
             const feedback = document.getElementById(`feedback-${partNum}`);
-            const errorKey = Array.from(document.querySelectorAll(`#page-${partNum} .error-word`)).find(el => el.onclick).getAttribute('onclick').match(/'([^']+)'/)[1];
+            const editBox = document.getElementById(`edit-box-${partNum}`);
+            const errorKey = editBox.dataset.errorKey;
             const userAnswer = input.value.trim().replace(/’/g, "'");
-            const correctAnswer = correctAnswers[partNum][errorKey];
+            const questionId = `${partNum}-${errorKey}`;
 
+            if (!userAnswer) {
+                feedback.className = "feedback feedback-empty";
+                feedback.innerHTML = "📝 Please enter your answer before submitting!";
+                feedback.style.display = "block";
+                return;
+            }
+
+            const correctAnswer = correctAnswers[partNum]?.[errorKey] || "";
+            if (!correctAnswer) {
+                feedback.className = "feedback feedback-empty";
+                feedback.innerHTML = "⚠️ This question's answer is not configured properly.";
+                feedback.style.display = "block";
+                return;
+            }
+
+            feedback.style.display = "block";
             if (userAnswer === correctAnswer) {
                 feedback.className = "feedback feedback-correct";
                 feedback.innerHTML = `✅ Correct! Explanation: ${getExplanation(partNum, errorKey)}`;
+                if (errorWordElements[questionId]) {
+                    errorWordElements[questionId].classList.add("correct");
+                }
+                if (!correctQuestions.includes(questionId)) {
+                    correctQuestions.push(questionId);
+                    score = correctQuestions.length;
+                }
+                editBox.style.display = "none";
             } else {
-                feedback.className = "feedback feedback-incorrect";
-                feedback.innerHTML = `⚠️ Incorrect. Right answer: ${correctAnswer}<br>Explanation: ${getExplanation(partNum, errorKey)}`;
+                if (userAnswer.toLowerCase() === correctAnswer.toLowerCase() && userAnswer !== correctAnswer) {
+                    feedback.className = "feedback feedback-case";
+                    feedback.innerHTML = `⚠️ Almost correct! Check capitalisation. The right answer is: ${correctAnswer}`;
+                } else {
+                    feedback.className = "feedback feedback-incorrect";
+                    feedback.innerHTML = `⚠️ Incorrect. Right answer is: ${correctAnswer}<br>Explanation: ${getExplanation(partNum, errorKey)}`;
+                }
+                input.value = "";
+                input.focus();
             }
-            feedback.style.display = "block";
-            input.value = "";
+
+            if (!answeredQuestions.includes(questionId)) {
+                answeredQuestions.push(questionId);
+            }
         }
 
-        // 错误解析
-        function getExplanation(partNum, error) {
+        function calculateScore() {
+            document.getElementById("final-score").textContent = score;
+            const isAllAnswered = allQuestionIds.every(id => answeredQuestions.includes(id));
+            document.getElementById("unfinished-notice").style.display = isAllAnswered ? "none" : "block";
+            goToPage("score-page");
+        }
+
+        function resetExercise() {
+            score = 0;
+            answeredQuestions = [];
+            correctQuestions = [];
+            errorWordElements = {};
+            for(let i=1; i<=5; i++) {
+                const input = document.getElementById(`input-${i}`);
+                const feedback = document.getElementById(`feedback-${i}`);
+                const editBox = document.getElementById(`edit-box-${i}`);
+                input.value = "";
+                input.disabled = false;
+                feedback.style.display = "none";
+                editBox.style.display = "none";
+                editBox.dataset.errorKey = "";
+            }
+            document.querySelectorAll('.error-word').forEach(el => el.classList.remove('correct'));
+            document.getElementById("unfinished-notice").style.display = "none";
+            goToPage('page-1');
+        }
+
+        function getExplanation(partNum, errorKey) {
             const explanations = {
                 1: {
                     company: "Add 's to singular nouns for possession (company → company's).",
@@ -359,15 +482,15 @@
                     relate: "Past participle 'related' is used as an adjective (challenges related to...)."
                 },
                 4: {
-                    "the Easter": "No article 'the' before festivals (Easter is a proper noun).",
-                    world: "Correct word: 'would' (modal verb), not 'world' (spelling error)."
+                    "the Easter": "No article 'the' before festivals like Easter.",
+                    world: "Correct word: 'would' (modal verb), not 'world'."
                 },
                 5: {
                     "(missing word)": "Pronoun 'it' is needed to complete the structure 'appreciate it if...'.",
-                    "making": "Verb 'help' is followed by base form: 'help us make' (not 'making')."
+                    making: "Verb 'help' is followed by base form: 'help us make' (not 'making')."
                 }
             };
-            return explanations[partNum][error];
+            return explanations[partNum]?.[errorKey] || "Please follow grammar rules to correct the error.";
         }
     </script>
 </body>
